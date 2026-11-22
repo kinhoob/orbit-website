@@ -40,7 +40,7 @@ function OrbitScene() {
     host.addEventListener('pointermove', move);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let frame = 0;
-    const render = (time: number) => { if (!reduced) { group.rotation.y += (pointer.x - group.rotation.y) * 0.015; group.rotation.x += (-pointer.y - group.rotation.x) * 0.015; orbit.rotation.z = time * 0.00022; sphere.position.y = Math.sin(time * 0.0007) * 0.045; } renderer.render(scene, camera); frame = requestAnimationFrame(render); };
+    const render = (time: number) => { if (!reduced) { group.rotation.y += (pointer.x - group.rotation.y) * 0.015; group.rotation.x += (-pointer.y - group.rotation.x) * 0.015; orbit.rotation.z = time * 0.00115; sphere.position.y = Math.sin(time * 0.0007) * 0.045; } renderer.render(scene, camera); frame = requestAnimationFrame(render); };
     frame = requestAnimationFrame(render);
     const resize = () => { if (!host) return; camera.aspect = host.clientWidth / host.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(host.clientWidth, host.clientHeight); };
     const observer = new ResizeObserver(resize); observer.observe(host);
