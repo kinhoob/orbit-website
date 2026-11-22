@@ -25,14 +25,32 @@ function OrbitScene() {
     host.appendChild(renderer.domElement);
     const group = new THREE.Group();
     scene.add(group);
-    const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.15, 72, 72), new THREE.MeshStandardMaterial({ color: 0xf4efe7, roughness: 0.33, metalness: 0.05 }));
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(0.88, 72, 72), new THREE.MeshStandardMaterial({ color: 0xf4efe7, roughness: 0.33, metalness: 0.05 }));
     group.add(sphere);
-    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.64, 0.016, 12, 180), new THREE.MeshBasicMaterial({ color: 0xe8c554 }));
-    ring.rotation.x = 1.12; ring.rotation.y = -0.36; group.add(ring);
-    const orbit = new THREE.Group(); orbit.rotation.copy(ring.rotation); group.add(orbit);
-    const satellite = new THREE.Mesh(new THREE.SphereGeometry(0.17, 32, 32), new THREE.MeshStandardMaterial({ color: 0xe8c554, emissive: 0x4f3d0b, emissiveIntensity: 0.42, roughness: 0.28 }));
-    satellite.position.set(1.64, 0, 0); orbit.add(satellite);
-    const halo = new THREE.Mesh(new THREE.TorusGeometry(1.28, 0.008, 8, 150), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 })); halo.rotation.x = 0.9; halo.rotation.y = 0.35; group.add(halo);
+    const orbitalBodies: { node: THREE.Group; speed: number; phase: number }[] = [];
+    const orbitSpecs = [
+      { radius: 1.34, tilt: [0.82, -0.42, 0.12], speed: 0.0013, color: 0xe8c554, count: 3, size: 0.09, alpha: 0.45 },
+      { radius: 1.72, tilt: [1.12, -0.36, 0], speed: -0.00086, color: 0xd8d0c2, count: 3, size: 0.075, alpha: 0.52 },
+      { radius: 2.08, tilt: [0.55, 0.88, -0.18], speed: 0.00062, color: 0xe8c554, count: 4, size: 0.11, alpha: 0.72 },
+      { radius: 2.38, tilt: [1.38, 0.24, 0.3], speed: -0.00045, color: 0xd78562, count: 3, size: 0.065, alpha: 0.32 },
+    ];
+    orbitSpecs.forEach((spec, orbitIndex) => {
+      const plane = new THREE.Euler(spec.tilt[0], spec.tilt[1], spec.tilt[2]);
+      const path = new THREE.Mesh(new THREE.TorusGeometry(spec.radius, orbitIndex === 2 ? 0.014 : 0.008, 8, 180), new THREE.MeshBasicMaterial({ color: spec.color, transparent: true, opacity: spec.alpha }));
+      path.rotation.copy(plane);
+      group.add(path);
+      const node = new THREE.Group();
+      node.rotation.copy(plane);
+      group.add(node);
+      for (let bodyIndex = 0; bodyIndex < spec.count; bodyIndex += 1) {
+        const angle = (Math.PI * 2 * bodyIndex) / spec.count + orbitIndex * 0.7;
+        const size = bodyIndex === 0 ? spec.size : spec.size * 0.58;
+        const body = new THREE.Mesh(new THREE.SphereGeometry(size, 20, 20), new THREE.MeshStandardMaterial({ color: spec.color, emissive: spec.color, emissiveIntensity: bodyIndex === 0 ? 0.2 : 0.08, roughness: 0.3 }));
+        body.position.set(Math.cos(angle) * spec.radius, Math.sin(angle) * spec.radius, 0);
+        node.add(body);
+      }
+      orbitalBodies.push({ node, speed: spec.speed, phase: orbitIndex * 1.4 });
+    });
     scene.add(new THREE.AmbientLight(0xffffff, 2));
     const key = new THREE.DirectionalLight(0xffffff, 3); key.position.set(-3, 4, 5); scene.add(key);
     const pointer = new THREE.Vector2();
@@ -40,7 +58,7 @@ function OrbitScene() {
     host.addEventListener('pointermove', move);
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     let frame = 0;
-    const render = (time: number) => { if (!reduced) { group.rotation.y += (pointer.x - group.rotation.y) * 0.015; group.rotation.x += (-pointer.y - group.rotation.x) * 0.015; orbit.rotation.z = time * 0.00115; sphere.position.y = Math.sin(time * 0.0007) * 0.045; } renderer.render(scene, camera); frame = requestAnimationFrame(render); };
+    const render = (time: number) => { if (!reduced) { group.rotation.y += (pointer.x - group.rotation.y) * 0.015; group.rotation.x += (-pointer.y - group.rotation.x) * 0.015; orbitalBodies.forEach(({ node, speed, phase }) => { node.rotation.z = time * speed + phase; }); sphere.position.y = Math.sin(time * 0.0007) * 0.045; } renderer.render(scene, camera); frame = requestAnimationFrame(render); };
     frame = requestAnimationFrame(render);
     const resize = () => { if (!host) return; camera.aspect = host.clientWidth / host.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(host.clientWidth, host.clientHeight); };
     const observer = new ResizeObserver(resize); observer.observe(host);

@@ -12,9 +12,9 @@ Criar um site de apresentação responsivo e imersivo para o Orbit, app social d
 - CTA sem prometer cadastro, download ou lista de espera inexistente; usar links informativos para o repositório e uma ação de conhecer o app.
 
 ## Direção visual e motion
-Usar a identidade documentada no PDF: carvão `#201D19`, painéis creme `#F4EFE7` e `#FDFBF7`, dourado `#E8C554`, tipografia Inter e marca circular creme com ponto dourado em órbita. Criar uma peça hero procedural em Three.js inspirada no OrbitMark, com órbita dourada, composição 3D e movimento suave. Evitar usar capas não licenciadas como se fossem capas oficiais.
+Usar a identidade documentada no PDF: carvão `#201D19`, painéis creme `#F4EFE7` e `#FDFBF7`, dourado `#E8C554`, tipografia Inter e marca circular creme com ponto dourado em órbita. Criar uma peça hero procedural em Three.js inspirada no OrbitMark, com quatro trajetórias 3D inclinadas em planos distintos e treze partículas/átomos em velocidades e sentidos diferentes. Acrescentar órbitas decorativas em CSS como camada independente, para que o movimento principal continue claro mesmo sem suporte WebGL. Evitar usar capas não licenciadas como se fossem capas oficiais.
 
-Coreografia: entrada curta do símbolo e título; movimento lento da órbita associado ao cursor em desktop; revelação progressiva das seções ao rolar; microinteração demonstrativa da nota de 0 a 10; transições discretas entre blocos. Respeitar `prefers-reduced-motion`, manter conteúdo e navegação utilizáveis sem animação, e otimizar para toque, telas pequenas e desempenho.
+Coreografia: entrada curta do símbolo e título; órbitas e partículas com movimento contínuo e legível, associado ao cursor em desktop; revelação progressiva das seções ao rolar; microinteração demonstrativa da nota de 0 a 10; transições discretas entre blocos. Variar sentidos e ritmos das órbitas para dar profundidade sem competir com o símbolo. Respeitar `prefers-reduced-motion`, manter conteúdo e navegação utilizáveis sem animação, e otimizar para toque, telas pequenas e desempenho.
 
 ## Implementação
 - Projeto Web gerenciado em `/home/ubuntu/erasmotion`, aproveitando o projeto recém-inicializado e sua Preview; os arquivos ainda estão vazios.
