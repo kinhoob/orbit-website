@@ -1,0 +1,79 @@
+import { useEffect, useRef, useState } from 'react';
+import * as THREE from 'three';
+import { ArrowDown, ArrowUpRight, BookOpen, Film, Headphones, Menu, Sparkles, Tv, X } from 'lucide-react';
+
+const categories = [
+  { name: 'Filmes', icon: Film, color: '#d78562' },
+  { name: 'Séries', icon: Tv, color: '#8395cf' },
+  { name: 'Animes', icon: Sparkles, color: '#c87591' },
+  { name: 'Livros', icon: BookOpen, color: '#779b75' },
+  { name: 'Música', icon: Headphones, color: '#c09a47' },
+];
+
+function OrbitScene() {
+  const mount = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const host = mount.current;
+    if (!host) return;
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 100);
+    camera.position.z = 7.4;
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.7));
+    renderer.setSize(host.clientWidth, host.clientHeight);
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
+    host.appendChild(renderer.domElement);
+    const group = new THREE.Group();
+    scene.add(group);
+    const sphere = new THREE.Mesh(new THREE.SphereGeometry(1.15, 72, 72), new THREE.MeshStandardMaterial({ color: 0xf4efe7, roughness: 0.33, metalness: 0.05 }));
+    group.add(sphere);
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(1.64, 0.016, 12, 180), new THREE.MeshBasicMaterial({ color: 0xe8c554 }));
+    ring.rotation.x = 1.12; ring.rotation.y = -0.36; group.add(ring);
+    const orbit = new THREE.Group(); orbit.rotation.copy(ring.rotation); group.add(orbit);
+    const satellite = new THREE.Mesh(new THREE.SphereGeometry(0.17, 32, 32), new THREE.MeshStandardMaterial({ color: 0xe8c554, emissive: 0x4f3d0b, emissiveIntensity: 0.42, roughness: 0.28 }));
+    satellite.position.set(1.64, 0, 0); orbit.add(satellite);
+    const halo = new THREE.Mesh(new THREE.TorusGeometry(1.28, 0.008, 8, 150), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.18 })); halo.rotation.x = 0.9; halo.rotation.y = 0.35; group.add(halo);
+    scene.add(new THREE.AmbientLight(0xffffff, 2));
+    const key = new THREE.DirectionalLight(0xffffff, 3); key.position.set(-3, 4, 5); scene.add(key);
+    const pointer = new THREE.Vector2();
+    const move = (event: PointerEvent) => { const rect = host.getBoundingClientRect(); pointer.x = ((event.clientX - rect.left) / rect.width - 0.5) * 0.55; pointer.y = ((event.clientY - rect.top) / rect.height - 0.5) * 0.4; };
+    host.addEventListener('pointermove', move);
+    const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let frame = 0;
+    const render = (time: number) => { if (!reduced) { group.rotation.y += (pointer.x - group.rotation.y) * 0.015; group.rotation.x += (-pointer.y - group.rotation.x) * 0.015; orbit.rotation.z = time * 0.00022; sphere.position.y = Math.sin(time * 0.0007) * 0.045; } renderer.render(scene, camera); frame = requestAnimationFrame(render); };
+    frame = requestAnimationFrame(render);
+    const resize = () => { if (!host) return; camera.aspect = host.clientWidth / host.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(host.clientWidth, host.clientHeight); };
+    const observer = new ResizeObserver(resize); observer.observe(host);
+    return () => { cancelAnimationFrame(frame); observer.disconnect(); host.removeEventListener('pointermove', move); renderer.dispose(); host.replaceChildren(); };
+  }, []);
+  return <div className="orbit-scene" ref={mount} aria-label="Símbolo tridimensional do Orbit em movimento" role="img" />;
+}
+
+function App() {
+  const [score, setScore] = useState(8);
+  const [menuOpen, setMenuOpen] = useState(false);
+  useEffect(() => {
+    const nodes = document.querySelectorAll<HTMLElement>('.reveal');
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { nodes.forEach((node) => node.classList.add('visible')); return; }
+    const observer = new IntersectionObserver((entries) => entries.forEach((entry) => { if (entry.isIntersecting) { entry.target.classList.add('visible'); observer.unobserve(entry.target); } }), { threshold: 0.16 });
+    nodes.forEach((node) => observer.observe(node));
+    return () => observer.disconnect();
+  }, []);
+  return <>
+    <header className="topbar"><a className="wordmark" href="#inicio" aria-label="Orbit — início"><span className="orbit-mark"><i /></span><span>orbit</span></a><nav className={menuOpen ? 'nav open' : 'nav'}><a onClick={() => setMenuOpen(false)} href="#descobrir">Descobrir</a><a onClick={() => setMenuOpen(false)} href="#avaliar">Avaliar</a><a onClick={() => setMenuOpen(false)} href="#juntos">Com amigos</a><a className="nav-cta" onClick={() => setMenuOpen(false)} href="https://github.com/kinhoob/orbit" target="_blank" rel="noreferrer">Acompanhe o projeto <ArrowUpRight size={15} /></a></nav><button className="menu-toggle" onClick={() => setMenuOpen(!menuOpen)} aria-label={menuOpen ? 'Fechar menu' : 'Abrir menu'}>{menuOpen ? <X /> : <Menu />}</button></header>
+    <main id="inicio">
+      <section className="hero">
+        <div className="hero-copy"><p className="eyebrow"><span className="live-dot" /> CULTURA BOA CIRCULA</p><h1>O que você<br />descobre <em>fica.</em></h1><p className="hero-intro">Um lugar para descobrir filmes, séries, livros, animes e sons — e dividir o que valeu a pena com quem entende você.</p><a className="button button-dark" href="#descobrir">Entre no Orbit <ArrowDown size={16} /></a><div className="hero-meta"><span>DESCUBRA · AVALIE · COMPARTILHE</span><span>00 — 05</span></div></div>
+        <div className="hero-art"><div className="art-orbit orbit-one"/><div className="art-orbit orbit-two"/><OrbitScene /><div className="orbit-note note-top"><span>SEU PRÓXIMO FAVORITO</span><strong>está por aí ↗</strong></div><div className="orbit-note note-bottom"><span>01 / CULTURA EM MOVIMENTO</span><strong>Orbit, em uma nova órbita.</strong></div><div className="grain" /></div>
+        <div className="hero-side-label">UMA REDE DE GOSTOS EM COMUM <span>↘</span></div>
+      </section>
+      <section className="manifesto section-pad" id="descobrir"><div className="section-kicker reveal"><span>01</span><span>O UNIVERSO ORBIT</span></div><div className="manifesto-grid"><h2 className="reveal">Cada gosto abre<br />uma <em>órbita nova.</em></h2><div className="manifesto-body reveal"><p>Tem sempre uma história esperando para ser encontrada. No Orbit, cultura circula entre coisas que você gosta e pessoas que têm algo a acrescentar.</p><a className="text-link" href="#categorias">Explore o que cabe no seu universo <ArrowUpRight size={15} /></a></div></div><div className="category-strip reveal" id="categorias">{categories.map(({ name, icon: Icon, color }, i) => <div className="category" key={name} style={{ '--category': color } as React.CSSProperties}><span className="category-index">0{i + 1}</span><Icon size={22} strokeWidth={1.6} /><span>{name}</span><ArrowUpRight className="category-arrow" size={15} /></div>)}</div></section>
+      <section className="rating-section section-pad" id="avaliar"><div className="section-kicker reveal"><span>02</span><span>GOSTO É PESSOAL. COMPARTILHAR TAMBÉM.</span></div><div className="rating-grid"><div className="rating-copy reveal"><h2>Uma nota.<br /><em>Seu ponto de vista.</em></h2><p>Dê uma nota de 0 a 10 e conte o que achou. Cada avaliação é sua — você escolhe quem pode ver.</p><div className="visibility"><span>VISIBILIDADE</span><span className="visibility-chip">◎ Pública</span><span className="visibility-chip">◉ Só amigos</span><span className="visibility-chip">◌ Privada</span></div></div><div className="rating-card reveal"><div className="card-top"><span>UMA AMOSTRA DO SEU GOSTO</span><span className="card-orbit">◉</span></div><div className="fiction-art"><div className="fiction-ring"/><div className="fiction-star">✳</div><span>UMA HISTÓRIA<br />CHAMA OUTRA</span></div><div className="fiction-info"><span className="fiction-type">OBRA · SUA AVALIAÇÃO</span><h3>O que fica com você?</h3><p>Uma história pode ser só sua. Ou virar conversa.</p></div><div className="score-label"><span>SUA NOTA</span><strong>{score.toFixed(1)}<small> / 10</small></strong></div><input aria-label="Escolher nota de 0 a 10" type="range" min="0" max="10" step="0.5" value={score} onChange={(event) => setScore(Number(event.target.value))} className="score-range" style={{ '--range': `${score * 10}%` } as React.CSSProperties} /><div className="range-labels"><span>0 — não rolou</span><span>10 — inesquecível</span></div></div></div></section>
+      <section className="friends-section section-pad" id="juntos"><div className="section-kicker reveal"><span>03</span><span>GOSTOS QUE SE ENCONTRAM</span></div><div className="friends-grid"><div className="friends-art reveal"><div className="friend-orbit friend-orbit-a"/><div className="friend-orbit friend-orbit-b"/><div className="friend-core"><span>o</span></div><div className="friend-dot dot-a">J</div><div className="friend-dot dot-b">M</div><div className="friend-dot dot-c">L</div><div className="friend-caption">DUAS ÓRBITAS. UM PAPO BOM.</div></div><div className="friends-copy reveal"><p className="eyebrow">NÃO É SEGUIR. É SE CONHECER.</p><h2>Descobertas<br />ficam melhores<br /><em>entre amigos.</em></h2><p>No Orbit, a amizade é dos dois lados. Envie um pedido, aceite o convite e descubram novas histórias juntos — cada um no seu ritmo.</p><a className="button button-cream" href="https://github.com/kinhoob/orbit" target="_blank" rel="noreferrer">Conheça o projeto <ArrowUpRight size={16} /></a></div></div></section>
+      <section className="closing section-pad"><div className="closing-star">✳</div><p className="eyebrow reveal">CULTURA BOA CIRCULA.</p><h2 className="reveal">Siga o fio.<br /><em>Veja onde ele leva.</em></h2><a className="button button-light reveal" href="https://github.com/kinhoob/orbit" target="_blank" rel="noreferrer">Acompanhe a construção do Orbit <ArrowUpRight size={16} /></a><p className="closing-footnote">Orbit está em desenvolvimento. Algumas experiências ainda estão em construção.</p></section>
+    </main>
+    <footer className="footer"><a className="wordmark footer-mark" href="#inicio"><span className="orbit-mark"><i /></span><span>orbit</span></a><span>FEITO PARA DESCOBRIR O QUE VEM A SEGUIR.</span><a href="#inicio">VOLTAR AO TOPO ↑</a></footer>
+  </>;
+}
+
+export default App;
