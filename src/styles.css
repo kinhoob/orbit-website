@@ -7,3 +7,41 @@
 .brand-orbit{position:absolute;z-index:2;left:50%;top:50%;width:clamp(150px,20vw,210px);aspect-ratio:1;transform:translate(-50%,-50%);display:grid;place-items:center;pointer-events:none}.brand-orbit__ring{position:absolute;inset:0;border:1px solid rgba(244,239,231,.48);border-radius:50%}.brand-orbit__core{position:absolute;width:60%;height:60%;border-radius:50%;background:var(--cream);box-shadow:0 10px 60px rgba(244,239,231,.12)}.brand-orbit__satellite{position:absolute;width:22px;height:22px;left:calc(50% - 11px);top:-3px;border-radius:50%;background:var(--gold);box-shadow:0 0 24px rgba(232,197,84,.85);transform-origin:11px calc(105px + 3px);animation:brand-orbit-spin 2.8s linear infinite}@keyframes brand-orbit-spin{to{transform:rotate(360deg)}}@media(max-width:650px){.brand-orbit{width:150px}.brand-orbit__satellite{transform-origin:11px 78px}}@media(prefers-reduced-motion:reduce){.brand-orbit__satellite{animation:none;transform:rotate(0)}}
 
 .hero-art .orbit-one{animation:orbit-roll-one 23s linear infinite}.hero-art .orbit-two{animation:orbit-roll-two 31s linear infinite}.hero-art::before,.hero-art::after{content:'';position:absolute;left:50%;top:50%;width:110%;height:78%;border:1px solid rgba(232,197,84,.12);border-radius:50%;pointer-events:none;z-index:0}.hero-art::before{transform:translate(-50%,-50%) rotate(18deg) scaleY(.34);animation:orbit-halo-one 28s linear infinite}.hero-art::after{width:94%;height:90%;border-color:rgba(244,239,231,.09);transform:translate(-50%,-50%) rotate(-34deg) scaleY(.3);animation:orbit-halo-two 37s linear infinite reverse}@keyframes orbit-roll-one{to{transform:rotate(332deg) scaleY(.42)}}@keyframes orbit-roll-two{to{transform:rotate(418deg) scaleY(.36)}}@keyframes orbit-halo-one{to{transform:translate(-50%,-50%) rotate(378deg) scaleY(.34)}}@keyframes orbit-halo-two{to{transform:translate(-50%,-50%) rotate(326deg) scaleY(.3)}}@media(prefers-reduced-motion:reduce){.hero-art .orbit-one,.hero-art .orbit-two,.hero-art::before,.hero-art::after{animation:none}}
+
+
+/* órbitas CSS: leves, visíveis sem WebGL e animadas só com transform */
+.orbit-scene{position:relative;width:100%;height:100%;z-index:1;pointer-events:none}
+.scene-orbit{position:absolute;left:50%;top:50%;width:60%;aspect-ratio:1;border:1px solid rgba(232,197,84,.36);border-radius:50%;transform:translate(-50%,-50%) rotate(-24deg) scaleY(.52)}
+.scene-orbit--inner{width:58%;border-color:rgba(232,197,84,.42);transform:translate(-50%,-50%) rotate(-24deg) scaleY(.52)}
+.scene-orbit--middle{width:76%;border-color:rgba(244,239,231,.32);transform:translate(-50%,-50%) rotate(54deg) scaleY(.42)}
+.scene-orbit--outer{width:92%;border-color:rgba(215,133,98,.3);transform:translate(-50%,-50%) rotate(-34deg) scaleY(.36)}
+.scene-orbit__spin{position:absolute;inset:0;animation:scene-spin 19s linear infinite;will-change:transform}
+.scene-orbit--middle .scene-orbit__spin{animation-duration:26s;animation-direction:reverse}
+.scene-orbit--outer .scene-orbit__spin{animation-duration:34s}
+.scene-atom{position:absolute;display:block;width:9px;height:9px;border-radius:50%;box-shadow:0 0 16px currentColor;transform-origin:center}
+.scene-atom--point-1{top:-4px;left:calc(50% - 4px)}
+.scene-atom--point-2{bottom:-3px;left:calc(50% - 3px);width:7px;height:7px}
+.scene-atom--gold{color:#e8c554;background:#f2d66c}
+.scene-atom--pale{color:#f4efe7;background:#fffaf1}
+.scene-atom--coral{color:#d78562;background:#efa17d}
+.scene-orbit--inner .scene-atom{transform:scaleY(1.92)}
+.scene-orbit--middle .scene-atom{transform:scaleY(2.38)}
+.scene-orbit--outer .scene-atom{transform:scaleY(2.78)}
+@keyframes scene-spin{to{transform:rotate(360deg)}}
+.manifesto,.rating-section,.friends-section,.closing{position:relative;isolation:isolate;overflow:hidden}
+.manifesto>:not(.ambient-atoms),.rating-section>:not(.ambient-atoms),.friends-section>:not(.ambient-atoms),.closing>:not(.ambient-atoms){position:relative;z-index:1}
+.ambient-atoms{position:absolute;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.ambient-atom{position:absolute;display:block;width:7px;height:7px;border-radius:50%;background:#e8c554;box-shadow:0 0 15px rgba(232,197,84,.5);opacity:0;animation:ambient-drift 14s ease-in-out infinite;animation-play-state:paused;will-change:transform,opacity}
+.ambient-atoms.is-in-view .ambient-atom{animation-play-state:running}
+.ambient-atom--one{left:9%;top:28%;width:6px;height:6px;animation-delay:-4s}
+.ambient-atom--two{left:83%;top:45%;width:4px;height:4px;background:#f4efe7;box-shadow:0 0 13px rgba(244,239,231,.55);animation-duration:18s;animation-delay:-9s}
+.ambient-atom--three{left:59%;top:83%;width:8px;height:8px;background:#d78562;box-shadow:0 0 16px rgba(215,133,98,.42);animation-duration:21s;animation-delay:-13s}
+.ambient-atoms--manifesto .ambient-atom--one{left:6%;top:21%}.ambient-atoms--manifesto .ambient-atom--two{left:88%;top:56%}.ambient-atoms--manifesto .ambient-atom--three{left:63%;top:86%}
+.ambient-atoms--rating .ambient-atom--one{left:7%;top:70%}.ambient-atoms--rating .ambient-atom--two{left:91%;top:19%}.ambient-atoms--rating .ambient-atom--three{left:48%;top:91%}
+.ambient-atoms--friends .ambient-atom--one{left:8%;top:19%}.ambient-atoms--friends .ambient-atom--two{left:91%;top:53%}.ambient-atoms--friends .ambient-atom--three{left:56%;top:88%}
+.ambient-atoms--closing .ambient-atom--one{left:12%;top:22%}.ambient-atoms--closing .ambient-atom--two{left:86%;top:33%}.ambient-atoms--closing .ambient-atom--three{left:72%;top:83%}
+@keyframes ambient-drift{0%,100%{transform:translate3d(0,0,0) scale(.82);opacity:.18}50%{transform:translate3d(9px,-18px,0) scale(1.08);opacity:.56}}
+@media(max-width:650px){.scene-orbit--inner{width:60%}.scene-orbit--middle{width:78%}.scene-orbit--outer{width:94%}.scene-atom{width:8px;height:8px}}
+@media(prefers-reduced-motion:reduce){.scene-orbit__spin{animation:none}.ambient-atom{animation:none;opacity:.25;will-change:auto}}
+
+.brand-orbit__satellite{animation-duration:6.5s}.hero-art .orbit-one{animation-duration:36s}.hero-art .orbit-two{animation-duration:48s}.hero-art::before{animation-duration:54s}.hero-art::after{animation-duration:66s}
